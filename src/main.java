@@ -1,3 +1,5 @@
+import org.w3c.dom.ls.LSOutput;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -140,6 +142,7 @@ class LaminaAnalizador extends JPanel {
 
         boolean primerDigitoEsNumero = false, puntoDespNumero = false;
         boolean yaEntro = false;
+
         for (int i = 0; i < cantCaracteres; i++) {
             //
             String caracter = getUnCaracterDeUnaPalabra().toUpperCase();
@@ -154,37 +157,32 @@ class LaminaAnalizador extends JPanel {
                 identificador = getComparacionDelCaracter(5, "SIMBOLO", caracter);
             }
 
-            if (identificador != null && iterador == 0) {
-                cadenaCaracteres += identificador.getCaracter();
-                identificadorAnterior = identificador;
-                iterador++;
-                System.out.println("Si entra al primer if :V");
-                if (identificador.getTipoIdentificador() == "NÚMERO") {
-                    primerDigitoEsNumero = true;
-                    System.out.println("El primer digito es un número");
-                }
+                if (identificador != null && iterador == 0) {
 
-            } else if (identificadorAnterior.getTipoIdentificador() == identificador.getTipoIdentificador()) {
-                cadenaCaracteres += identificador.getCaracter();
-
-                    /*
-                    if (primerDigitoEsNumero==true && String.valueOf(identificador.getCaracter())== ".") {
-                        puntoDespNumero = true;
+                    cadenaCaracteres += identificador.getCaracter();
+                    identificadorAnterior = identificador;
+                    iterador++;
+                    if (identificador.getTipoIdentificador() == "NÚMERO") {
+                        primerDigitoEsNumero = true;
                     }
-                    */
 
-            } else {
-                areaPalabrasListadas.append(identificador.getTipoIdentificador() + ": " + cadenaCaracteres);
-                cadenaCaracteres = "";
-                cadenaCaracteres += identificador.getCaracter();
-                identificadorAnterior = identificador;
-                puntoDespNumero = false;
-                primerDigitoEsNumero = false;
-            }
+                } else if (identificador != null && identificadorAnterior.getTipoIdentificador() == identificador.getTipoIdentificador()) {
+                    cadenaCaracteres += identificador.getCaracter();
+
+                } else if(identificador== null){
+                    areaPalabrasListadas.append("Error: "+caracter);
+                }
+                else {
+                    areaPalabrasListadas.append(identificadorAnterior.getTipoIdentificador() + ": " + cadenaCaracteres+"\n");
+                    cadenaCaracteres = "";
+                    cadenaCaracteres += identificador.getCaracter();
+                    identificadorAnterior = identificador;
+                    primerDigitoEsNumero = false;
+                }
         }
-        if (identificadorAnterior != null) {
-            String expresionCompleta = ">>>>>>>»»»" + ":   " + cadenaCaracteres + "\n";
-            areaPalabrasListadas.append(expresionCompleta);
+            if (identificadorAnterior != null) {
+                String expresionCompleta = identificadorAnterior.getTipoIdentificador() + ":   " + cadenaCaracteres + "\n";
+                areaPalabrasListadas.append(expresionCompleta);
         }
     }
         private class Oyente implements ActionListener {
@@ -197,17 +195,17 @@ class LaminaAnalizador extends JPanel {
                 do {
                     cadena = cadena.trim();
                     posicion = cadena.indexOf(" ");
-                    if (posicion == -1) break;
-                    auxCadena = cadena.substring(0, posicion);
+                    //if (posicion == -1) break;
+                    auxCadena = cadena.substring(0, posicion+1);
                     System.out.println(auxCadena); //////////////////////////////////////////
                     palabra = auxCadena.trim();
                     getPalabraIdentificada();
 
-                    aux2CadenaResto = cadena.substring(posicion, cadena.length());
+                    aux2CadenaResto = cadena.substring(posicion+1, cadena.length());
                     cadena = aux2CadenaResto.trim();
 
                     auxCadena.trim();
-
+                    //if (posicion == -1) break;
                 } while (posicion != -1);
                 System.out.println(aux2CadenaResto.trim());///////////////////
                 palabra = aux2CadenaResto.trim();
