@@ -140,9 +140,12 @@ class LaminaAnalizador extends JPanel {
         int iterador = 0;
         boolean isId = false, isNumEntero = false, isNumDecimal = false, isSimbolo = false, isError = false;
 
-        boolean primerDigitoEsNumero = false, puntoDespNumero = false;
-        boolean yaEntro = false;
+        boolean primerDigitoEsNumero = false, primerDigitoEsID = false, primerDigitoEsSimbolo= false;
+        boolean pasoAca = false;
+        String nombreIdentificadorDePaso = "";
+        boolean numYPuntoAntes= false;
 
+        boolean ahoraEsLetra = false;
         for (int i = 0; i < cantCaracteres; i++) {
             //
             String caracter = getUnCaracterDeUnaPalabra().toUpperCase();
@@ -162,33 +165,76 @@ class LaminaAnalizador extends JPanel {
                     cadenaCaracteres += identificador.getCaracter();
                     identificadorAnterior = identificador;
                     iterador++;
-                    if (identificador.getTipoIdentificador() == "NÚMERO") {
-                        primerDigitoEsNumero = true;
-                    }
+
+                    if (identificador.getTipoIdentificador() == "NÚMERO") primerDigitoEsNumero = true;
+                    if (identificador.getTipoIdentificador() == "IDENTIFICADOR") primerDigitoEsID = true;
+                    if (identificador.getTipoIdentificador() == "SIMBOLO") primerDigitoEsSimbolo = true;
+
 
                 } else if (identificador != null && identificadorAnterior.getTipoIdentificador() == identificador.getTipoIdentificador()) {
                     cadenaCaracteres += identificador.getCaracter();
 
                 } else if(identificador== null){
-                    areaPalabrasListadas.append("Error: "+caracter);
+                    areaPalabrasListadas.append("Error caracter inválido: "+caracter +"\n");
                 }
                 else {
-                    areaPalabrasListadas.append(identificadorAnterior.getTipoIdentificador() + ": " + cadenaCaracteres+"\n");
-                    cadenaCaracteres = "";
-                    cadenaCaracteres += identificador.getCaracter();
-                    identificadorAnterior = identificador;
-                    primerDigitoEsNumero = false;
+
+                    if (identificador.getTipoIdentificador()=="IDENTIFICADOR"){
+                        ahoraEsLetra = true;
+                        areaPalabrasListadas.append(identificadorAnterior.getTipoIdentificador() + ": " + cadenaCaracteres+"\n");
+                        cadenaCaracteres = "";
+                        cadenaCaracteres += identificador.getCaracter();
+                        identificadorAnterior = identificador;
+                        primerDigitoEsNumero = false;
+
+                    }else if(ahoraEsLetra==true && identificadorAnterior.getTipoIdentificador()== "IDENTIFICADOR" && identificador.getTipoIdentificador() == "NÚMERO" ||
+                    identificadorAnterior.getTipoIdentificador() == "NÚMERO" && ahoraEsLetra== true){
+                        cadenaCaracteres += identificador.getCaracter();
+
+                        if (identificador.getTipoIdentificador()!= "NÚMERO") ahoraEsLetra = false;
+                    }else if(primerDigitoEsID && identificadorAnterior.getTipoIdentificador()=="IDENTIFICADOR" && identificador.getTipoIdentificador()=="NÚMERO"){
+                        cadenaCaracteres += identificador.getCaracter();
+                        identificadorAnterior= identificador;
+                        nombreIdentificadorDePaso = "IDENTIFICADOR: ";
+                        pasoAca = true;
+                    }
+                    else if(identificador.getCaracter()=='.'  && identificadorAnterior.getTipoIdentificador()=="NÚMERO" && primerDigitoEsNumero==true){
+                        numYPuntoAntes = true;
+                        cadenaCaracteres += identificador.getCaracter();
+                        identificadorAnterior = identificador;
+                    }else if(numYPuntoAntes== true && primerDigitoEsNumero==true && identificadorAnterior.getCaracter()== '.' && identificador.getTipoIdentificador()=="NÚMERO"){
+                        cadenaCaracteres += identificador.getCaracter();
+                        identificadorAnterior = identificador;
+                        nombreIdentificadorDePaso = "NÚMERO _DECIMAL: ";
+                        numYPuntoAntes = false;
+                        pasoAca = true;
+                    }else{
+                        if (pasoAca==true) {
+                            areaPalabrasListadas.append(nombreIdentificadorDePaso + ": " + cadenaCaracteres+"\n");
+                            pasoAca =false;
+                        }
+                        else areaPalabrasListadas.append(identificadorAnterior.getTipoIdentificador() + ": " + cadenaCaracteres+"\n");
+                        cadenaCaracteres = "";
+                        cadenaCaracteres += identificador.getCaracter();
+                        identificadorAnterior = identificador;
+                        primerDigitoEsNumero = false;
+                    }
                 }
         }
             if (identificadorAnterior != null) {
-                String expresionCompleta = identificadorAnterior.getTipoIdentificador() + ":   " + cadenaCaracteres + "\n";
-                areaPalabrasListadas.append(expresionCompleta);
+                if (pasoAca==true) {
+                    areaPalabrasListadas.append(nombreIdentificadorDePaso + ": " + cadenaCaracteres + "\n");
+                    pasoAca=false;
+                }
+                else areaPalabrasListadas.append(identificadorAnterior.getTipoIdentificador() + ": " + cadenaCaracteres+"\n");
         }
     }
         private class Oyente implements ActionListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                areaPalabrasListadas.setText("");
                 String auxCadena = "", aux2CadenaResto = "", cadena;
                 int posicion = 0;
                 cadena = areaTexto.getText().replaceAll("\n", " ");
