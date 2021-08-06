@@ -4,6 +4,8 @@ public enum Identificadores {
         SIMBOLO3(';',"SIMBOLO"),
         SIMBOLO4(',',"SIMBOLO"),
         SIMBOLO5('.',"SIMBOLO"),
+        SIMBOLO6('{',"SIMBOLO"),
+        SIMBOLO7('}',"SIMBOLO"),
         DIGITO1('0',"NÚMERO"),
         DIGITO2('1',"NÚMERO"),
         DIGITO3('2',"NÚMERO"),

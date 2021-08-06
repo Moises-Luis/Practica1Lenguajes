@@ -46,10 +46,9 @@ class LaminaAnalizador extends JPanel {
         boton.addActionListener(new Oyente());
         laminaSuperior.add(boton);
 
-
-
         areaPalabrasListadas = new JTextArea(9, 22);
         areaPalabrasListadas.setLineWrap(false);
+        areaPalabrasListadas.setEditable(false);
         laminaPalabrasListadas = new JScrollPane(areaPalabrasListadas);
         laminaCentral.add(laminaPalabrasListadas);
     }
@@ -154,7 +153,7 @@ class LaminaAnalizador extends JPanel {
                 identificador = getComparacionDelCaracter(10, "DIGITO", caracter);
             }
             if (identificador == null) {
-                identificador = getComparacionDelCaracter(5, "SIMBOLO", caracter);
+                identificador = getComparacionDelCaracter(7, "SIMBOLO", caracter);
             }
                 if (identificador != null && iterador == 0) { //Con esto sabre si es un digito o un identificador
                     cadenaCaracteres += identificador.getCaracter();
